@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
+import { Link, withRouter } from 'react-router-dom'
 import postData from "./Utils"
-import './index.css';
+import Movie from "./Movie"
+import { InputText } from 'primereact/components/inputtext/InputText';
+import { Button } from 'primereact/components/button/Button';
+import { AutoComplete } from 'primereact/components/autocomplete/AutoComplete';
+import 'primereact/resources/primereact.min.css';
+import 'primereact/resources/themes/omega/theme.css';
+import 'font-awesome/css/font-awesome.css';
 
 class Search extends Component {
     constructor(props) {
@@ -8,65 +15,69 @@ class Search extends Component {
 
         this.state = {
             movies: [],
-            isLoading: false,
-            error: null
+            titles: [],
+            error: null,
+            location: this.props.location
         }
         this.handleSearchButton = this.handleSearchButton.bind(this);
-        this.handleAddMovie = this.handleAddMovie.bind(this);
+        this.handleSelectMovie = this.handleSelectMovie.bind(this);
     }
     
+//    componentDidMount() {
+//    	window.setInterval(() => {
+//    		console.log(this.props.location);
+//    	}, 500);
+//    }
     handleSearchButton(event) {
-    	if (event.type === "keypress" &&
-    		event.key !== "Enter")
-    		return;
-    	
-        this.setState({ isLoading: true });
-        const searchField = encodeURI(this.search.value);
-        
-        if (!searchField || 0 === searchField.length) {
-          this.setState({ movies: [], isLoading: false }) 
-          return;
-          }
-
-        fetch('https://api.themoviedb.org/3/search/movie?api_key=7f705cf4bbb5ffb5e56e76e86c09947f&query=' + searchField)
-        .then(response => response.json())
-        .then(data => {
-            const movies = [];
-            data.results.forEach(movie => {
-                movies.push({title: movie.title, movieId: movie.id});
-            })
-            this.setState({ movies: movies, isLoading: false }) 
-        })
-        .catch(error => this.setState({ error, isLoading: false }));
+    	setTimeout(() => {
+	        fetch('https://api.themoviedb.org/3/search/movie?api_key=7f705cf4bbb5ffb5e56e76e86c09947f&query=' + event.query)
+	        .then(response => response.json())
+	        .then(data => {
+	            const movies = [];
+	            const titles = [];
+	            data.results.forEach(movie => {
+	            	const titleWithYear = movie.title + " - " + movie.release_date.slice(0, 4);
+	                movies.push({title: titleWithYear, movieId: movie.id});
+	            	titles.push(titleWithYear);
+	            })
+	            this.setState({ movies: movies, titles: titles, selected: false});
+	        })
+	        .catch(error => this.setState({ error }));
+    	}, 50);
     }
     
-    handleAddMovie(event, title, movieId) {
-    	postData('http://localhost:8080/api/movies', {movieId: movieId, name: title, rating: -1, review: ""})
-    	  .then(data => {
-    		  console.log(data); // JSON from `response.json()` call
-    		  this.setState({ movies: [], isLoading: false }) ;
-    	  })
-    	  .catch(error => console.error(error))
+    handleSelectMovie(event) {
+    	const selectedMovie = this.state.movies.filter(movie => {
+    		return (movie.title === event.value);
+    	});
+    	
+    	this.setState({movieId: selectedMovie[0].movieId});
+    	//console.log("MOVIE ID ::::: " + this.state.movieId);
     }
 
     render() {
+    	let movie;
+    	
+    	if (this.state.movieId > 0)
+    		movie = <Movie movieId={this.state.movieId} location = {this.props.location}/>
+    	else
+    		movie = null;
+    	
         return (
-            <div id="myDropdown" className="dropdown-content">
-                <input type="text" 
-                       placeholder="Search.."
-                       id="myInput" 
-                       ref= {input => this.search = input}
-                       onKeyPress={this.handleSearchButton}/>
-                <button onClick={this.handleSearchButton}>
-                   Search
-                </button>
-                {this.state.movies.map(movie =>
-                  <a onClick={(event) => this.handleAddMovie(event, movie.title, movie.movieId)}
-                     key = {movie.movieId}>
-                     {movie.title}
-                  </a>
-                )}
-            </div>
+                <div>
+	                <div className="ui-inputgroup">
+		                <span className="ui-inputgroup-addon"><i className="fa fa-film"></i></span>
+		                <AutoComplete value={this.state.title} 
+		                              onChange={(event) => this.setState({title: event.value})}
+		                              onSelect={this.handleSelectMovie}
+		                              placeholder="Enter movie name..."
+		                              suggestions={this.state.titles} 
+		                              minLength={1}
+		                              completeMethod={this.handleSearchButton}/>
+	                </div>
+	                <br /><br />
+	                {movie}
+                </div>
         )
     }
 }

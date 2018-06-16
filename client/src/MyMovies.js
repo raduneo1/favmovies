@@ -19,8 +19,7 @@ class MyMovies extends Component {
         .then(data => {
             const movies = [];
             data._embedded.movies.forEach(movie => {
-            	console.log(movie.movieId);
-                movies.push({title: movie.name, movieId: movie.movieId});
+                movies.push({title: movie.title, movieId: movie.movieId});
             })
             this.setState({ movies: movies}) 
         })

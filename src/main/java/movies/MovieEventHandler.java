@@ -20,7 +20,6 @@ public class MovieEventHandler {
   @HandleBeforeCreate
   @HandleBeforeSave
   public void handleMovieSave(Movie movie) {
-	  System.out.println("duplicateeeeee");
 	  if (this.repository.findByMovieId(movie.getMovieId()) != null) {
 		  throw new DuplicateKeyException("Duplicate key is found");
 	  }

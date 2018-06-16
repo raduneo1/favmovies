@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Navbar from './Navbar'
-import MyMovies from './MyMovies'
+import Header from './Header'
+import Main from './Main'
 
 class App extends Component {
   render() {
@@ -10,10 +10,10 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Favorite movies application</h1>
         </header>
-        <Navbar/>
-        <MyMovies/>
+        <Header/>
+        <Main/>
       </div>
     );
   }
