@@ -17,15 +17,15 @@ class MyMovies extends Component {
             error: {}
         }
         
-        this.getFavoriteMovies = this.getFavoriteMovies.bind(this);
+        this.getMyMovies = this.getMyMovies.bind(this);
         this.rowExpansionTemplate = this.rowExpansionTemplate.bind(this);
     }
     
     componentDidMount() {
-    	this.getFavoriteMovies();
+    	this.getMyMovies();
     }
     
-    getFavoriteMovies() {
+    getMyMovies() {
         fetch('http://localhost:8080/api/movies')
         .then(response => response.json())
         .then(data => {
@@ -42,14 +42,12 @@ class MyMovies extends Component {
         	console.log("GETTING MOVIES");
         })
         .catch(error => this.setState({ error }));
-        
-        //console.log(this.state.expandedRows);
     }
     
     rowExpansionTemplate(data) {
         return  <div className="ui-g ui-fluid">
 	               <div>
-	                 <Movie movieId={data.movieId} updateMovies={this.getFavoriteMovies}/>
+	                 <Movie movieId={data.movieId} updateMovies={this.getMyMovies}/>
 	               </div>
                 </div>;
     }
@@ -57,10 +55,12 @@ class MyMovies extends Component {
     render() {
 	    const header = <div style={{'textAlign':'left'}}>
 	        <div>
-	             <h3>Favorite Movies <Button icon="fa-refresh" style={{'float':'right'}} 
-	                                         onClick={this.getFavoriteMovies}/></h3> 
+	             <h3><span className="ui-inputgroup-addon">
+	                   <i className="fa fa-film"></i></span> 
+	                   &nbsp; My Movies 
+	             </h3> 
 	        </div>
-	        <br/>
+
 	        <div className="ui-inputgroup">
 		        <span className="ui-inputgroup-addon"><i className="fa fa-search"></i></span>
 		        <InputText type="search" onInput={(e) => this.setState({globalFilter: e.target.value})} 

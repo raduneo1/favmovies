@@ -11,7 +11,6 @@ class Movie extends Component {
         super(props);
         
         this.saveMovie = this.saveMovie.bind(this);
-        //this.handleSaveUserInfo = this.handleSaveUserInfo.bind(this);
         
         this.state = {
             average: 0,
@@ -44,21 +43,25 @@ class Movie extends Component {
 
     saveMovie(event, state) {
     	// If the movie does not have a URL (does not exist on the server), then we use POST. Else we use PUT
-    	const putUrl = this.state.movieUrl;
+    	const movieUrl = this.state.movieUrl;
     	const movieId = this.state.movieId;
     	const title = this.state.title;
     	const year = this.state.year;
     	const rating = this.state.rating;
     	const review = this.state.review;
     	
-    	const hasPutURL = !(putUrl === null || putUrl === undefined || putUrl === "");
+    	const hasPutURL = !(movieUrl === null || movieUrl === undefined || movieUrl === "");
     	const method = (hasPutURL) ? 'PUT' : 'POST';
-    	const url = (hasPutURL) ? putUrl : 'http://localhost:8080/api/movies';
-    	//console.log('TEST: ' + this.state.movieUrl + " " + method);
+    	const url = (hasPutURL) ? movieUrl : 'http://localhost:8080/api/movies';
+        
+    	// 1. Save movie info (POST)
     	postData(url, {movieId, title, year, rating, review}, method)
+    	  .then(response => response.json()) // parses response to JSON  
     	  .then(data => {
     		  console.log(data); // JSON from `response.json()` call
     		  this.setState({ isUserInfoModified: false});
+    		  
+    		  // 2. Get updated parent myMovies info (GET)
     		  if (this.props.updateMovies !== undefined &&
     		      this.props.updateMovies !== null) {
     		     this.props.updateMovies();

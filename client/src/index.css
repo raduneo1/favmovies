@@ -14,7 +14,10 @@ body {
 
 #movieTable, #movieTable td
 {
-    text-align: left; 
-    vertical-align: middle;
+  text-align: left; 
+  vertical-align: middle;
 }
 
+li.review {
+	list-style-type: none;
+}

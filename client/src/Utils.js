@@ -9,7 +9,7 @@ export function postData(url, data, method) {
     mode: 'cors', // no-cors, cors, *same-origin
     redirect: 'follow', // manual, *follow, error
   })
-  .then(response => response.json()) // parses response to JSON
+
 }
 
 export function getRatingDescription(rating) {
