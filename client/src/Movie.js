@@ -3,14 +3,15 @@ import {Panel} from 'primereact/components/panel/Panel';
 import {Rating} from 'primereact/components/rating/Rating';
 import {Button} from 'primereact/components/button/Button';
 import {InputTextarea} from 'primereact/components/inputtextarea/InputTextarea';
-import postData from "./Utils"
+import { getRatingDescription, postData } from "./Utils"
 import './index.css';
 
 class Movie extends Component {
     constructor(props) {
         super(props);
         
-        this.handleAddMovie = this.handleAddMovie.bind(this);
+        this.saveMovie = this.saveMovie.bind(this);
+        //this.handleSaveUserInfo = this.handleSaveUserInfo.bind(this);
         
         this.state = {
             average: 0,
@@ -21,7 +22,10 @@ class Movie extends Component {
             title: "",
             movieId: this.props.movieId,
             rating: 0,
-            review: ""
+            review: "",
+            isUserInfoModified: false,
+            year: "",
+            movieURL: ""
         }
         
     }
@@ -38,19 +42,36 @@ class Movie extends Component {
 
     }
 
-    handleAddMovie(event, movieId, title, rating, review) {	
-    	postData('http://localhost:8080/api/movies', {movieId, title, rating, review})
+    saveMovie(event, state) {
+    	// If the movie does not have a URL (does not exist on the server), then we use POST. Else we use PUT
+    	const putUrl = this.state.movieUrl;
+    	const movieId = this.state.movieId;
+    	const title = this.state.title;
+    	const year = this.state.year;
+    	const rating = this.state.rating;
+    	const review = this.state.review;
+    	
+    	const hasPutURL = !(putUrl === null || putUrl === undefined || putUrl === "");
+    	const method = (hasPutURL) ? 'PUT' : 'POST';
+    	const url = (hasPutURL) ? putUrl : 'http://localhost:8080/api/movies';
+    	//console.log('TEST: ' + this.state.movieUrl + " " + method);
+    	postData(url, {movieId, title, year, rating, review}, method)
     	  .then(data => {
     		  console.log(data); // JSON from `response.json()` call
+    		  this.setState({ isUserInfoModified: false});
+    		  if (this.props.updateMovies !== undefined &&
+    		      this.props.updateMovies !== null) {
+    		     this.props.updateMovies();
+    		  }
     	  })
     	  .catch(error => console.error(error))
     }
     
     getMovieInfo(movieId) {
+    	// Get movie public info (tmdb)
         fetch('https://api.themoviedb.org/3/movie/' + movieId + '?api_key=7f705cf4bbb5ffb5e56e76e86c09947f')
-        .then(response => response.json())
-        .then(data => {
-
+          .then(response => response.json())
+          .then(data => {
             this.setState(
 	    		{
                 average: data.vote_average,
@@ -58,10 +79,41 @@ class Movie extends Component {
                 overview: data.overview,
                 release_date: data.release_date,
                 title: data.title,
+                year: data.release_date.slice(0, 4)
 	            })
-        })
-        .catch(error => this.setState({ error, isLoading: false }));
+          })
+          .catch(error => this.setState({ error }));
+        
+          //verify if movie is saved on the server
+          fetch('http://localhost:8080/api/movies/search/findByMovieId?movieId=' + movieId)
+          .then(response => {
+        	  if (response.status === 200) {
+        		  return response.json();
+        	  } else { // Will break promise chain here
+                  this.setState(
+          	    	{ rating: 0, review: "" }
+          	      ); 
+        		  throw new Error('The movie does not exist on the server');
+        	  }
+          })
+          .then(data => {
+              this.setState(
+      	         { movieUrl: data._links.self.href }
+      	      );
+              console.log(data._links.self.href);
+              return data._links.self.href;
+          })
+          // Get movie user info (server)
+          .then(movieUrl => fetch(movieUrl))
+          .then(response => response.json())
+          .then(data => {
+        	  this.setState(
+    	    	{ rating: data.rating, review: data.review }
+    	      ); 
+          })
+          .catch(error => this.setState({ error }));
     }
+    
     
     render() {
         return (
@@ -70,47 +122,50 @@ class Movie extends Component {
 			        <tbody>
 			            <tr>
 			              <th>Title:</th>
-			              <th>{this.state.title}</th> 
+			              <td>{this.state.title}</td> 
 			            </tr>
 			            <tr>
 			              <th>Release date:</th>
-			              <th>{this.state.release_date}</th> 
+			              <td>{this.state.release_date}</td> 
 			            </tr>
 			            <tr>
 			              <th>Language:</th>
-			              <th>{this.state.language}</th> 
+			              <td>{this.state.language}</td> 
 			            </tr>
 			            <tr>
 			              <th>Average:</th>
-			              <th>{this.state.average}</th> 
+			              <td>{this.state.average}</td> 
 			            </tr>
 			            <tr>
 			              <th>Your rating:</th>
-			              <th><Rating value={this.state.rating} 
-			                          onChange={(e) => this.setState({rating: e.value})} 
-			                          stars={10}/>
-			              </th> 
+			              <td><span><Rating value={this.state.rating}
+                                      stars={10}
+			                          onChange={event => this.setState({ rating: event.value, 
+			                        	                                 isUserInfoModified: true })} />
+			                  {'  (' + getRatingDescription(this.state.rating) + ')'}
+                              </span>
+			              </td> 
 			            </tr>
 			            <tr>
 			              <th>Overview:</th>
-			              <th>{this.state.overview}</th> 
+			              <td>{this.state.overview}</td> 
 			            </tr>
 			            <tr>
 			              <th>Review:</th>
-			              <th><InputTextarea rows={3} cols={10} autoResize={true} 
+			              <td><br/><InputTextarea rows={2} cols={50} autoResize={true} 
 			                                 value={this.state.review} 
-			                                 onChange={(event) => this.setState({review: event.target.value})}/>
-			              </th> 
+			                                 onChange={(event) => this.setState({ review: event.target.value, 
+			                                	                                  isUserInfoModified: true })} />
+			              </td> 
 			            </tr>
 			            <tr>
 			              <th></th>
-			              <th><Button icon="fa-check" cornerStyleClass="ui-button-success"
-			            	          disabled={this.state.review.length < 5}
-			                          onClick={event => {this.handleAddMovie(event, this.props.movieId, 
-			                        		                                 this.state.title, this.state.rating, 
-			                        		                                 this.state.review)}}>
-			                     Save
-			                  </Button></th> 
+			              <td><Button icon="fa-check" cornerStyleClass="ui-button-success"
+			            	          disabled={!this.state.isUserInfoModified}
+			                          onClick={this.saveMovie}>
+			                    Save
+			                  </Button>
+			              </td>
 			            </tr>
 		            </tbody>
 		        </table>

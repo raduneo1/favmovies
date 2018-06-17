@@ -59,7 +59,7 @@ class Search extends Component {
     	let movie;
     	
     	if (this.state.movieId > 0)
-    		movie = <Movie movieId={this.state.movieId} location = {this.props.location}/>
+    		movie = <Movie movieId={this.state.movieId} updateMovies={null}/>
     	else
     		movie = null;
     	

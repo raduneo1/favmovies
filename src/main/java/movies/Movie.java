@@ -11,7 +11,8 @@ public class Movie {
 	private int movieId;
 	private String title = "Unknown";
 	private int rating;
-	private String review;
+	private String review = "";
+	public int year;
 	
 	public Movie() {}
 	
@@ -57,6 +58,14 @@ public class Movie {
 	}
 	
 	
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
+	}
+
 	public String toString() {
 		return movieId + " : " + title;
 	}

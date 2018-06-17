@@ -10,15 +10,15 @@ class Main extends Component {
     render() {
         return (
 		  <main>
-		  <div className="ui-g ui-fluid">
-          <div className="ui-g-12 ui-md-6">
-		    <Switch>
-		      <Route exact path='/' component={Home}/>
-		      <Route path='/search' component={Search}/>
-		      <Route path='/movies' component={MyMovies}/>
-		    </Switch>
+		  <div className="ui-g">
+	          <div className="ui-g-12 ui-md-6">
+			    <Switch>
+			      <Route exact path='/' component={Home}/>
+			      <Route path='/search' component={Search}/>
+			      <Route path='/movies' component={MyMovies}/>
+			    </Switch>
 		      </div>
-		      </div>
+		   </div>
 		  </main>
         )
     }

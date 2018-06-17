@@ -1,15 +1,31 @@
-function postData(url, data) {
+export function postData(url, data, method) {
   // Default options are marked with *
 	//debugger;
   return fetch(url, {
 	headers: { "Content-type": "application/json" },
     body: JSON.stringify(data), // must match 'Content-Type' header
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    method: method, // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, cors, *same-origin
     redirect: 'follow', // manual, *follow, error
   })
   .then(response => response.json()) // parses response to JSON
 }
 
-export default postData;
+export function getRatingDescription(rating) {
+	let description = " ";
+	if (rating === 10) {
+		description = "Perfect"
+	} else if (rating >= 8 && rating <= 9) {
+		description = "Excellent"	
+    } else if (rating === 7) {
+		description = "Fair"	        	
+    } else if (rating >= 5 && rating <= 6) {
+		description = "Average"	        	
+    } else if (rating >= 1 && rating <= 4) {
+		description = "Poor"	          	
+    } else {
+    	description = "unrated"
+    }
+	return description;
+}
