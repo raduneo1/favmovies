@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Movie from "./Movie"
 import postData from "./Utils"
+import { GET_REST_MY_MOVIES_URL } from './Const'
 import {DataTable} from 'primereact/components/datatable/DataTable';
 import {Column} from 'primereact/components/column/Column';
 import {Button} from 'primereact/components/button/Button';
@@ -26,15 +27,16 @@ class MyMovies extends Component {
     }
     
     getMyMovies() {
-        fetch('http://localhost:8080/api/movies')
+        fetch(GET_REST_MY_MOVIES_URL)
         .then(response => response.json())
         .then(data => {
             const movies = [];
             data._embedded.movies.forEach(movie => {
                 movies.push({
-                	title: movie.title, 
+                	title: movie.title,
+                	genre: movie.genre,
                 	year: movie.year, 
-                	rating: movie.rating, 
+                	rating: movie.rating + '/10', 
                 	movieId: movie.movieId
                 });
             })
@@ -45,11 +47,15 @@ class MyMovies extends Component {
     }
     
     rowExpansionTemplate(data) {
-        return  <div className="ui-g ui-fluid">
-	               <div>
-	                 <Movie movieId={data.movieId} updateMovies={this.getMyMovies}/>
-	               </div>
-                </div>;
+        return (
+			<div className="ui-g ui-fluid">
+	           <div>
+	             <Movie movieId={data.movieId} 
+	                    updateMovies={this.getMyMovies}
+	                    imgBaseUrl={this.props.imgBaseUrl}/>
+	           </div>
+	        </div>
+	        );
     }
     
     render() {
@@ -72,13 +78,13 @@ class MyMovies extends Component {
             <div className="content-section implementation">
 	            <DataTable value={this.state.movies} globalFilter={this.state.globalFilter} 
 	                       header={header} 
-                           responsive={true}
 	                       expandedRows={this.state.expandedRows} 
 	                       onRowToggle={(e) => this.setState({expandedRows:e.data})}
 	                       rowExpansionTemplate={this.rowExpansionTemplate}>
 	                <Column expander={true} style={{width: '2em'}} />
 	                <Column field="title" header="Title" sortable={true}/>
 	                <Column field="year" header="Year" sortable={true}/>
+	                <Column field="genre" header="Genre" sortable={true}/>
 	                <Column field="rating" header="Rating" sortable={true}/>
 	            </DataTable>
             </div>

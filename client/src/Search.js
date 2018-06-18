@@ -8,7 +8,9 @@ import { AutoComplete } from 'primereact/components/autocomplete/AutoComplete';
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/omega/theme.css';
 import 'font-awesome/css/font-awesome.css';
+import { SEARCH_TMDB_MOVIES_BY_TITLE_URL } from './Const'
 
+  
 class Search extends Component {
     constructor(props) {
         super(props);
@@ -23,22 +25,19 @@ class Search extends Component {
         this.handleSelectMovie = this.handleSelectMovie.bind(this);
     }
     
-//    componentDidMount() {
-//    	window.setInterval(() => {
-//    		console.log(this.props.location);
-//    	}, 500);
-//    }
     handleSearchButton(event) {
     	setTimeout(() => {
-	        fetch('https://api.themoviedb.org/3/search/movie?api_key=7f705cf4bbb5ffb5e56e76e86c09947f&query=' + event.query)
+	        fetch(SEARCH_TMDB_MOVIES_BY_TITLE_URL + event.query)
 	        .then(response => response.json())
 	        .then(data => {
 	            const movies = [];
 	            const titles = [];
 	            data.results.forEach(movie => {
 	            	const titleWithYear = movie.title + " - " + movie.release_date.slice(0, 4);
-	                movies.push({title: titleWithYear, movieId: movie.id});
 	            	titles.push(titleWithYear);
+	            	// Second array, 'movies', created solely to keep track of movieIds
+	            	//   (PrimeReact 'AutoComplete' component does not allow storing objects)
+	                movies.push({title: titleWithYear, movieId: movie.id});
 	            })
 	            this.setState({ movies: movies, titles: titles, selected: false});
 	        })
@@ -52,32 +51,28 @@ class Search extends Component {
     	});
     	
     	this.setState({movieId: selectedMovie[0].movieId});
-    	//console.log("MOVIE ID ::::: " + this.state.movieId);
     }
 
     render() {
-    	let movie;
-    	
-    	if (this.state.movieId > 0)
-    		movie = <Movie movieId={this.state.movieId} updateMovies={null}/>
-    	else
-    		movie = null;
-    	
         return (
-                <div>
-	                <div className="ui-inputgroup">
-		                <span className="ui-inputgroup-addon"><i className="fa fa-film"></i></span>
-		                <AutoComplete value={this.state.title} 
-		                              onChange={(event) => this.setState({title: event.value})}
-		                              onSelect={this.handleSelectMovie}
-		                              placeholder="Enter movie name..."
-		                              suggestions={this.state.titles} 
-		                              minLength={1}
-		                              completeMethod={this.handleSearchButton}/>
-	                </div>
-	                <br /><br />
-	                {movie}
+            <div>
+                <div className="ui-inputgroup">
+	                <span className="ui-inputgroup-addon"><i className="fa fa-film"></i></span>
+	                <AutoComplete value={this.state.title} 
+	                              onChange={(event) => this.setState({title: event.value})}
+	                              onSelect={this.handleSelectMovie}
+	                              placeholder="Enter movie name..."
+	                              suggestions={this.state.titles} 
+	                              minLength={1}
+	                              completeMethod={this.handleSearchButton}/>
                 </div>
+                <br /><br />
+                { (this.state.movieId > 0) ? 
+                		<Movie movieId={this.state.movieId} 
+                               updateMovies={null} 
+                               imgBaseUrl={this.props.imgBaseUrl}/> : null
+                }
+            </div>
         )
     }
 }

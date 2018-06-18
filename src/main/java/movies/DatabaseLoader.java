@@ -21,8 +21,8 @@ public class DatabaseLoader implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// save a couple of movies
-		repository.save(new Movie(268, "Batman"));
-		repository.save(new Movie(272, "Batman Begins"));
+		repository.save(new Movie(268, "Batman", 1900));
+		repository.save(new Movie(272, "Batman Begins", 1900));
 		
 		// fetch all customers
 		log.info("Movies found with findAll():");

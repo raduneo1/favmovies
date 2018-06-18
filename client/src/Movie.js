@@ -1,4 +1,10 @@
 import React, { Component } from 'react';
+import { GET_REST_MY_MOVIES_URL,
+	     SEARCH_REST_MOVIES_BY_MOVIEID_URL,
+	     GET_TMDB_MOVIE_URL_1,
+	     GET_TMDB_MOVIE_URL_2,
+	     TMDB_IMG_SIZE_MED
+	   } from './Const'
 import {Panel} from 'primereact/components/panel/Panel';
 import {Rating} from 'primereact/components/rating/Rating';
 import {Button} from 'primereact/components/button/Button';
@@ -9,8 +15,6 @@ import './index.css';
 class Movie extends Component {
     constructor(props) {
         super(props);
-        
-        this.saveMovie = this.saveMovie.bind(this);
         
         this.state = {
             average: 0,
@@ -27,9 +31,11 @@ class Movie extends Component {
             movieURL: ""
         }
         
+        this.saveMovie = this.saveMovie.bind(this);
     }
     
-
+    // Necessary, or else selecting another suggestion 
+    //   in Autocomplete does not update Movie component
     componentWillReceiveProps(nextProps) {
     	  if (nextProps.movieId !== this.props.movieId) {
     		  this.getMovieInfo(nextProps.movieId);
@@ -40,22 +46,27 @@ class Movie extends Component {
     	this.getMovieInfo(this.state.movieId);
 
     }
+    
 
+    
     saveMovie(event, state) {
     	// If the movie does not have a URL (does not exist on the server), then we use POST. Else we use PUT
+    	const genre = this.state.genre;
     	const movieUrl = this.state.movieUrl;
     	const movieId = this.state.movieId;
-    	const title = this.state.title;
-    	const year = this.state.year;
+    	const posterPath = this.state.posterPath;
     	const rating = this.state.rating;
     	const review = this.state.review;
+    	const title = this.state.title;
+    	const year = this.state.year;
     	
     	const hasPutURL = !(movieUrl === null || movieUrl === undefined || movieUrl === "");
     	const method = (hasPutURL) ? 'PUT' : 'POST';
-    	const url = (hasPutURL) ? movieUrl : 'http://localhost:8080/api/movies';
+    	const url = (hasPutURL) ? movieUrl : GET_REST_MY_MOVIES_URL;
+    	const payload = { genre, movieId, title, year, rating, review, posterPath };
         
     	// 1. Save movie info (POST)
-    	postData(url, {movieId, title, year, rating, review}, method)
+    	postData(url, payload, method)
     	  .then(response => response.json()) // parses response to JSON  
     	  .then(data => {
     		  console.log(data); // JSON from `response.json()` call
@@ -72,14 +83,23 @@ class Movie extends Component {
     
     getMovieInfo(movieId) {
     	// Get movie public info (tmdb)
-        fetch('https://api.themoviedb.org/3/movie/' + movieId + '?api_key=7f705cf4bbb5ffb5e56e76e86c09947f')
+        fetch(GET_TMDB_MOVIE_URL_1 + movieId + GET_TMDB_MOVIE_URL_2)
           .then(response => response.json())
           .then(data => {
+        	const genre = data.genres
+        	   .map(g => g.name)
+        	   .reduce((genres, genre) => genres + ", " + genre);
+        	
+        	const director = data.credits.crew.find(person => person.job.toLowerCase() === 'director').name;
+        	
             this.setState(
 	    		{
                 average: data.vote_average,
+                director: director,
+                genre: genre,
                 language: data.spoken_languages[0].name,
                 overview: data.overview,
+                posterPath: data.poster_path,
                 release_date: data.release_date,
                 title: data.title,
                 year: data.release_date.slice(0, 4)
@@ -87,8 +107,8 @@ class Movie extends Component {
           })
           .catch(error => this.setState({ error }));
         
-          //verify if movie is saved on the server
-          fetch('http://localhost:8080/api/movies/search/findByMovieId?movieId=' + movieId)
+          // 1. Verify if movie exists on REST API and get its URL
+          fetch(SEARCH_REST_MOVIES_BY_MOVIEID_URL + movieId)
           .then(response => {
         	  if (response.status === 200) {
         		  return response.json();
@@ -106,7 +126,7 @@ class Movie extends Component {
               console.log(data._links.self.href);
               return data._links.self.href;
           })
-          // Get movie user info (server)
+          // 2. Get movie user info from REST API
           .then(movieUrl => fetch(movieUrl))
           .then(response => response.json())
           .then(data => {
@@ -119,9 +139,13 @@ class Movie extends Component {
     
     
     render() {
-        return (
+    	const imageUrl = this.props.imgBaseUrl + TMDB_IMG_SIZE_MED + this.state.posterPath;
+        console.log("lalala" + imageUrl);
+    	return (
 	        <Panel header={this.state.title}>
-		        <table id="movieTable">
+		        <table id="movieTable"
+		        	   style={{background: 'url(' + imageUrl + ') no-repeat right top'
+		        		       }}>
 			        <tbody>
 			            <tr>
 			              <th>Title:</th>
@@ -136,6 +160,14 @@ class Movie extends Component {
 			              <td>{this.state.language}</td> 
 			            </tr>
 			            <tr>
+			              <th>Genre:</th>
+			              <td>{this.state.genre}</td> 
+			            </tr>
+			            <tr>
+			              <th>Director:</th>
+			              <td>{this.state.director}</td> 
+			            </tr>
+			            <tr>
 			              <th>Average:</th>
 			              <td>{this.state.average}</td> 
 			            </tr>
@@ -145,17 +177,17 @@ class Movie extends Component {
                                       stars={10}
 			                          onChange={event => this.setState({ rating: event.value, 
 			                        	                                 isUserInfoModified: true })} />
-			                  {'  (' + getRatingDescription(this.state.rating) + ')'}
+			                  {'(' + getRatingDescription(this.state.rating) + ')'}
                               </span>
 			              </td> 
 			            </tr>
 			            <tr>
 			              <th>Overview:</th>
-			              <td>{this.state.overview}</td> 
+			              <td><br /><br /><br />{this.state.overview}</td> 
 			            </tr>
 			            <tr>
 			              <th>Review:</th>
-			              <td><br/><InputTextarea rows={2} cols={50} autoResize={true} 
+			              <td><br/><InputTextarea rows={2} cols={60} autoResize={true} 
 			                                 value={this.state.review} 
 			                                 onChange={(event) => this.setState({ review: event.target.value, 
 			                                	                                  isUserInfoModified: true })} />

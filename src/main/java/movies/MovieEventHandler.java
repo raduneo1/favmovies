@@ -4,6 +4,7 @@ import static movies.WebSocketConfiguration.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.rest.core.annotation.HandleAfterCreate;
+import org.springframework.data.rest.core.annotation.HandleAfterSave;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
@@ -37,8 +38,18 @@ public class MovieEventHandler {
     @HandleAfterCreate
     public void handleAfterCreate(Movie movie) {
   	    if (!movie.getReview().isEmpty()) {
+  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "//10)";
 		  this.websocket.convertAndSend(
-				MESSAGE_PREFIX + "/newReview", "{\"message\" : \"message\"}");
+				MESSAGE_PREFIX + "/newReview", "{\"message\" : \"" + message + "\"}");
+	    }
+    }
+    
+    @HandleAfterSave
+    public void handleAfterSave(Movie movie) {
+  	    if (!movie.getReview().isEmpty()) {
+  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "//10)";
+		  this.websocket.convertAndSend(
+				MESSAGE_PREFIX + "/changeReview", "{\"message\" : \"" + message + "\"}");
 	    }
     }
 

@@ -1,24 +1,58 @@
 package movies;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import javax.persistence.*;
+import javax.validation.constraints.*;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Movie {
 	
+	private String genre = "";
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
-	private int movieId;
-	private String title = "Unknown";
-	private int rating;
-	private String review = "";
-	public int year;
 	
+	@LastModifiedDate
+	private LocalDateTime modifiedTime;
+	
+	@Positive(message = "MovieId must be positive.")
+	private int movieId;
+	
+	@Min(value = 0, message = "Rating cannot be less than 0.")
+	@Max(value = 10, message = "Rating cannot be more than 10.")
+	private int rating = 0;
+	private String posterPath;
+	
+	@Column(name = "review", nullable = false, length = 500)
+	private String review = "";
+	
+	@NotBlank(message = "Movie title cannot be blank.")
+	private String title = "Unknown";
+	
+	@Min(value = 1900, message = "Enter a valid movie release year")
+	@Max(value = 2050, message = "Enter a valid movie release year")
+	private int year;
+
+
 	public Movie() {}
 	
-	public Movie(int movieId, String name) {
+	public Movie(int movieId, String title, int year) {
 		this.movieId = movieId;
-		this.title = name;
+		this.title = title;
+		this.year = year;
+	}
+	
+	public String getGenre() {
+		return genre;
+	}
+
+	public void setGenre(String genre) {
+		this.genre = genre;
 	}
 	
 	public Long getId() {
@@ -32,13 +66,17 @@ public class Movie {
 	public void setMovieId(int movieId) {
 		this.movieId = movieId;
 	}
-
-	public String getTitle() {
-		return title;
+	
+	public LocalDateTime getModifiedTime() {
+		return modifiedTime;
+	}
+		
+	public String getPosterPath() {
+		return posterPath;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setPosterPath(String posterPath) {
+		this.posterPath = posterPath;
 	}
 
 	public int getRating() {
@@ -57,6 +95,13 @@ public class Movie {
 		this.review = review;
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
 	
 	public int getYear() {
 		return year;
@@ -69,5 +114,6 @@ public class Movie {
 	public String toString() {
 		return movieId + " : " + title;
 	}
+
 		
 }
