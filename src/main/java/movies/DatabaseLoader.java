@@ -1,37 +1,52 @@
 package movies;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
     
-	private final MovieRepository repository;
-	private static final Logger log = LoggerFactory.getLogger(DatabaseLoader.class);
+	private final MovieRepository movies;
+	private final UserRepository users;
 	
 	@Autowired
-	public DatabaseLoader(MovieRepository repository) {
-		this.repository = repository;
+	public DatabaseLoader(MovieRepository movieRepository,
+			              UserRepository userRepository) {
+		this.movies = movieRepository;
+		this.users = userRepository;
 	}
 	
 	@Override
-	public void run(String... args) throws Exception {
-		// save a couple of movies
-		repository.save(new Movie(268, "Batman", 1900));
-		repository.save(new Movie(272, "Batman Begins", 1900));
-		
-		// fetch all customers
-		log.info("Movies found with findAll():");
-		log.info("-------------------------------");
-		for (Movie movie : repository.findAll()) {
-			log.info(movie.toString());
-		}
-		log.info("");
+	public void run(String... strings) throws Exception {
 
+		User radu = this.users.save(new User("radu", "radu",
+							"ROLE_MANAGER"));
+		User james = this.users.save(new User("james", "james",
+							"ROLE_MANAGER"));
+
+		SecurityContextHolder.getContext().setAuthentication(
+			new UsernamePasswordAuthenticationToken("radu", "doesn't matter",
+				AuthorityUtils.createAuthorityList("ROLE_MANAGER")));
+
+		this.movies.save(new Movie(192, "Batman Begins", 2006, radu));
+		this.movies.save(new Movie(242, "Spiderman", 2001, radu));
+		this.movies.save(new Movie(511, "Untouchables", 1997, radu));
+
+		SecurityContextHolder.getContext().setAuthentication(
+			new UsernamePasswordAuthenticationToken("james", "doesn't matter",
+				AuthorityUtils.createAuthorityList("ROLE_MANAGER")));
+
+		this.movies.save(new Movie(192, "Batman Begins", 2006, james));
+		this.movies.save(new Movie(242, "Spiderman", 2001, james));
+		this.movies.save(new Movie(511, "Untouchables", 1997, james));
+		
+		SecurityContextHolder.clearContext();
 	}
 
 }

@@ -187,8 +187,8 @@ class Movie extends Component {
 			            </tr>
 			            <tr>
 			              <th>Review:</th>
-			              <td><br/><InputTextarea rows={2} cols={60} autoResize={true} 
-			                                 value={this.state.review} 
+			              <td><br/><InputTextarea rows={2} cols={60} autoResize={true} maxLength={20}
+			                                 value={this.state.review}
 			                                 onChange={(event) => this.setState({ review: event.target.value, 
 			                                	                                  isUserInfoModified: true })} />
 			              </td> 

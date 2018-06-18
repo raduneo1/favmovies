@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Movie {
 	
+	private @ManyToOne User user;
+	
 	private String genre = "";
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -41,7 +43,7 @@ public class Movie {
 
 	public Movie() {}
 	
-	public Movie(int movieId, String title, int year) {
+	public Movie(int movieId, String title, int year, User user) {
 		this.movieId = movieId;
 		this.title = title;
 		this.year = year;
@@ -95,6 +97,14 @@ public class Movie {
 		this.review = review;
 	}
 	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public String getTitle() {
 		return title;
 	}

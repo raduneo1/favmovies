@@ -10,7 +10,7 @@ Main features:
 - TMDB: uses tMDB for movie API requests to acquire movie data and images
 - PRIME REACT: uses PrimeReact for uniform styling and dynamic React-ready Components, such as movie Autocomplete, and dynamic/sortable tables
 - OTHER: auditing is setup on server side in order to track when entities are created, event handler also used to prevent POST conflicts
-- TTESTING: 
+- TESTING: 
 - VALIDATION: Validation using JSR 380 (Bean Validation 2.0) on server side and PrimeReact on client side
 
 v1.0
@@ -38,6 +38,15 @@ v3.0
 - setup Stomp and WebSockets on client and server side to notify users when new reviews are published to the REST API:
 Home page on client side will update when this happens
 
+v4.0 
+- moved Socket logic to Main in order to have access to send growl messages through entire application
+- socket endpoint added for review updates (before we only had review creation) 
+- changed types of Movie object server-side in order to allow for larger reviews (> 250 characters due to VarChar(255) type used in database by default for String)
+- setup auditing and custom query method on server side in order to record when new movies are created and sort new reviews by time of creation
+- moved all constants to Const.js files and removed 'magic numbers'
+- loaded movie image info on startup and shown image on the Movie and Review pages (medium and small images, respectively) 
+- added new movie fields such as movie director and movie genre
+- setup bean validation on server side using Bean Validation 2.0
 
 Challenges:
 

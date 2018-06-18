@@ -10,6 +10,7 @@ import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,13 +20,17 @@ public class MovieEventHandler {
 	private final SimpMessagingTemplate websocket;
 	private final EntityLinks entityLinks;
 	
+	private final UserRepository userRepository;
+
 	@Autowired
 	public MovieEventHandler(MovieRepository repository, 
 			                 SimpMessagingTemplate websocket, 
-			                 EntityLinks entityLinks) {
+			                 EntityLinks entityLinks,
+			                 UserRepository userRepository) {
 		this.repository = repository;
 		this.websocket = websocket;
 		this.entityLinks = entityLinks;
+		this.userRepository = userRepository;
 	}
   
     @HandleBeforeCreate
@@ -34,7 +39,7 @@ public class MovieEventHandler {
 		    throw new DuplicateKeyException("Duplicate key is found");
 	    }
     }
-  
+
     @HandleAfterCreate
     public void handleAfterCreate(Movie movie) {
   	    if (!movie.getReview().isEmpty()) {
@@ -52,14 +57,20 @@ public class MovieEventHandler {
 				MESSAGE_PREFIX + "/changeReview", "{\"message\" : \"" + message + "\"}");
 	    }
     }
+    
+	@HandleBeforeCreate
+	@HandleBeforeSave
+	public void applyUserInformationUsingSecurityContext(Movie movie) {
 
-	/**
-	 * Take an {@link Employee} and get the URI using Spring Data REST's {@link EntityLinks}.
-	 *
-	 * @param employee
-	 */
-	private String getPath(Movie movie) {
-		return this.entityLinks.linkForSingleResource(movie.getClass(),
-				  movie.getId()).toUri().getPath();
+		String name = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = this.userRepository.findByName(name);
+		if (user == null) {
+			User newUser = new User();
+			newUser.setName(name);
+			newUser.setRoles(new String[]{"ROLE_MANAGER"});
+			user = this.userRepository.save(newUser);
+		}
+		movie.setUser(user);
 	}
+
 }

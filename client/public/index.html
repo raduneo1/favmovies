@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -17,6 +17,12 @@
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
+    <div>
+		    Hello, <span id="managername" th:text="${#authentication.name}">user</span>.
+		    <form th:action="@{/logout}" method="post">
+		        <input type="submit" value="Log Out"/>
+		    </form>
+		</div>
     <div id="root"></div>
     <!--
       This HTML file is a template.
