@@ -31,15 +31,16 @@ public class DatabaseLoader implements CommandLineRunner {
 							"ROLE_MANAGER"));
 
 		SecurityContextHolder.getContext().setAuthentication(
-			new UsernamePasswordAuthenticationToken("radu", "doesn't matter",
+			new UsernamePasswordAuthenticationToken("radu", "radu",
 				AuthorityUtils.createAuthorityList("ROLE_MANAGER")));
 
 		this.movies.save(new Movie(192, "Batman Begins", 2006, radu));
 		this.movies.save(new Movie(242, "Spiderman", 2001, radu));
 		this.movies.save(new Movie(511, "Untouchables", 1997, radu));
 
+		System.out.println("MEEEEEEEEEEEE: " + radu.getName());
 		SecurityContextHolder.getContext().setAuthentication(
-			new UsernamePasswordAuthenticationToken("james", "doesn't matter",
+			new UsernamePasswordAuthenticationToken("james", "james",
 				AuthorityUtils.createAuthorityList("ROLE_MANAGER")));
 
 		this.movies.save(new Movie(192, "Batman Begins", 2006, james));

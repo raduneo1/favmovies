@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Movie from "./Movie"
-import postData from "./Utils"
+import { getReqREST } from "./Utils"
 import { GET_REST_MY_MOVIES_URL } from './Const'
 import {DataTable} from 'primereact/components/datatable/DataTable';
 import {Column} from 'primereact/components/column/Column';
@@ -25,9 +25,9 @@ class MyMovies extends Component {
     componentDidMount() {
     	this.getMyMovies();
     }
-    
+
     getMyMovies() {
-        fetch(GET_REST_MY_MOVIES_URL)
+        getReqREST(GET_REST_MY_MOVIES_URL)
         .then(response => response.json())
         .then(data => {
             const movies = [];

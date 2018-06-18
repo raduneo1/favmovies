@@ -7,9 +7,11 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@CrossOrigin
 public class Movie {
 	
 	private @ManyToOne User user;

@@ -33,12 +33,7 @@ public class MovieEventHandler {
 		this.userRepository = userRepository;
 	}
   
-    @HandleBeforeCreate
-    public void handleBeforeCreate(Movie movie) {
-	    if (this.repository.findByMovieId(movie.getMovieId()) != null) {
-		    throw new DuplicateKeyException("Duplicate key is found");
-	    }
-    }
+
 
     @HandleAfterCreate
     public void handleAfterCreate(Movie movie) {
@@ -64,7 +59,11 @@ public class MovieEventHandler {
 
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
 		User user = this.userRepository.findByName(name);
+		System.out.println("Event usersssssssssssssss");
+		System.out.println(name);
+		
 		if (user == null) {
+			System.out.println("New user");
 			User newUser = new User();
 			newUser.setName(name);
 			newUser.setRoles(new String[]{"ROLE_MANAGER"});

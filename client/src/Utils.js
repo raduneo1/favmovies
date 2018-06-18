@@ -1,8 +1,9 @@
-export function postData(url, data, method) {
+export function postReqREST(url, data, method) {
   // Default options are marked with *
 	//debugger;
   return fetch(url, {
 	headers: { "Content-type": "application/json" },
+	credentials: 'include',
     body: JSON.stringify(data), // must match 'Content-Type' header
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
     method: method, // *GET, POST, PUT, DELETE, etc.
@@ -10,6 +11,14 @@ export function postData(url, data, method) {
     redirect: 'follow', // manual, *follow, error
   })
 
+}
+
+export function getReqREST(url) {
+    return fetch(url, {
+      credentials: 'include',
+      method: 'GET',
+      mode: 'cors'
+    });
 }
 
 export function getRatingDescription(rating) {

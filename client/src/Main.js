@@ -6,6 +6,7 @@ import Reviews from './Reviews'
 import Movie from './Movie'
 import MyMovies from './MyMovies'
 import Search from './Search'
+import { getReqREST } from "./Utils"
 import { SEARCH_REST_MOVIES_BY_REVIEW_NOT_EMPTY_URL,
 		 WEBSOCKET_URL,
 		 WEBSOCKET_TOPICS,
@@ -45,7 +46,7 @@ class Main extends Component {
     }
     
     getReviews() {
-        fetch(SEARCH_REST_MOVIES_BY_REVIEW_NOT_EMPTY_URL)
+        getReqREST(SEARCH_REST_MOVIES_BY_REVIEW_NOT_EMPTY_URL)
         .then(response => response.json())
         .then(data => {
         	console.log("GETTING REVIEWS");

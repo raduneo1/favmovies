@@ -9,7 +9,7 @@ import {Panel} from 'primereact/components/panel/Panel';
 import {Rating} from 'primereact/components/rating/Rating';
 import {Button} from 'primereact/components/button/Button';
 import {InputTextarea} from 'primereact/components/inputtextarea/InputTextarea';
-import { getRatingDescription, postData } from "./Utils"
+import { getRatingDescription, postReqREST, getReqREST } from "./Utils"
 import './index.css';
 
 class Movie extends Component {
@@ -66,7 +66,7 @@ class Movie extends Component {
     	const payload = { genre, movieId, title, year, rating, review, posterPath };
         
     	// 1. Save movie info (POST)
-    	postData(url, payload, method)
+    	postReqREST(url, payload, method)
     	  .then(response => response.json()) // parses response to JSON  
     	  .then(data => {
     		  console.log(data); // JSON from `response.json()` call
@@ -108,7 +108,7 @@ class Movie extends Component {
           .catch(error => this.setState({ error }));
         
           // 1. Verify if movie exists on REST API and get its URL
-          fetch(SEARCH_REST_MOVIES_BY_MOVIEID_URL + movieId)
+          getReqREST(SEARCH_REST_MOVIES_BY_MOVIEID_URL + movieId)
           .then(response => {
         	  if (response.status === 200) {
         		  return response.json();
@@ -127,7 +127,7 @@ class Movie extends Component {
               return data._links.self.href;
           })
           // 2. Get movie user info from REST API
-          .then(movieUrl => fetch(movieUrl))
+          .then(movieUrl => getReqREST(movieUrl))
           .then(response => response.json())
           .then(data => {
         	  this.setState(

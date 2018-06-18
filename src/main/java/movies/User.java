@@ -1,7 +1,7 @@
 package movies;
 
 import javax.persistence.*;
-
+import java.util.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -13,7 +13,10 @@ public class User {
 	public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
 	private @Id @GeneratedValue Long id;
-
+    
+	@OneToMany(mappedBy = "user")
+	private Set<Movie> movies = new HashSet<>();
+	 
 	private String name;
     
 	private String[] roles;
@@ -28,6 +31,10 @@ public class User {
 		this.setRoles(roles);
 	}
 
+    public Set<Movie> getMovies() {
+        return movies;
+    }
+    
 	public String getName() {
 		return name;
 	}
