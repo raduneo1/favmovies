@@ -48,6 +48,15 @@ v4.0
 - added new movie fields such as movie director and movie genre
 - setup bean validation on server side using Bean Validation 2.0
 
+v5.0
+- migrated from font-awesome to primeicons (due to dependencies in new primereact)
+- created User entity + relationships
+- completed security login setup for Spring security
+- adjusted CORS and requests on client side to include credentials, in order for requests to function with new security policies
+- changed overall file structure to make it much more organized
+- switched to use frontend-maven-plugin instead of create-react-app, which allows serving the client-side at the same location (URL) as server-side
+(frontend-maven-plugin handles installing npp, the necessary modules, and using webpack to serve the client side code automatically)
+
 Challenges:
 
 

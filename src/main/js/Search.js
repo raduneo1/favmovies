@@ -5,9 +5,6 @@ import Movie from "./Movie"
 import { InputText } from 'primereact/components/inputtext/InputText';
 import { Button } from 'primereact/components/button/Button';
 import { AutoComplete } from 'primereact/components/autocomplete/AutoComplete';
-import 'primereact/resources/primereact.min.css';
-import 'primereact/resources/themes/omega/theme.css';
-import 'font-awesome/css/font-awesome.css';
 import { SEARCH_TMDB_MOVIES_BY_TITLE_URL } from './Const'
 
   

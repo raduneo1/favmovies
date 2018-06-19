@@ -7,7 +7,6 @@ import {Column} from 'primereact/components/column/Column';
 import {Button} from 'primereact/components/button/Button';
 import {InputText} from 'primereact/components/inputtext/InputText';
 import {OverlayPanel} from 'primereact/components/overlaypanel/OverlayPanel';
-import './index.css';
 
 class MyMovies extends Component {
     constructor(props) {

@@ -10,7 +10,7 @@ import {Rating} from 'primereact/components/rating/Rating';
 import {Button} from 'primereact/components/button/Button';
 import {InputTextarea} from 'primereact/components/inputtextarea/InputTextarea';
 import { getRatingDescription, postReqREST, getReqREST } from "./Utils"
-import './index.css';
+
 
 class Movie extends Component {
     constructor(props) {

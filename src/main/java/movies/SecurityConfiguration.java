@@ -17,7 +17,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -36,8 +36,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http
 		    .cors()
 		        .and()
-		    .authorizeRequests()
-				.antMatchers("/**", "/movies", "/**").permitAll()
+			.authorizeRequests()
+				.antMatchers("/built/**", "/main.css").permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.formLogin()
@@ -46,13 +46,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and()
 			.httpBasic()
 				.and()
-			.csrf().disable() // leave csrf on in production
+			.csrf().disable()
 			.logout()
-	            .invalidateHttpSession(true)
-	            .clearAuthentication(true)
-	            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-	            .logoutSuccessUrl("/") 
-	            .permitAll();
+				.logoutSuccessUrl("/");
 	}
 
 }
