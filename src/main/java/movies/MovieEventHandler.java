@@ -38,7 +38,7 @@ public class MovieEventHandler {
     @HandleAfterCreate
     public void handleAfterCreate(Movie movie) {
   	    if (!movie.getReview().isEmpty()) {
-  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "//10)";
+  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "/10)";
 		  this.websocket.convertAndSend(
 				MESSAGE_PREFIX + "/newReview", "{\"message\" : \"" + message + "\"}");
 	    }
@@ -47,7 +47,7 @@ public class MovieEventHandler {
     @HandleAfterSave
     public void handleAfterSave(Movie movie) {
   	    if (!movie.getReview().isEmpty()) {
-  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "//10)";
+  	      String message = "User changed review for \'" + movie.getTitle() + "\' (" + movie.getRating() + "/10)";
 		  this.websocket.convertAndSend(
 				MESSAGE_PREFIX + "/changeReview", "{\"message\" : \"" + message + "\"}");
 	    }

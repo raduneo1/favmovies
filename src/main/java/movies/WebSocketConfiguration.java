@@ -14,7 +14,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/reviews").setAllowedOrigins("http://localhost:3000").withSockJS();
+		registry.addEndpoint("/reviews").setAllowedOrigins("https://fav-movie-1-react.herokuapp.com").withSockJS();
 	}
 
 	@Override
