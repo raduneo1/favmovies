@@ -1,5 +1,6 @@
 package movies;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -7,21 +8,29 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@CrossOrigin
 public class Movie {
+	
+	@JoinColumn(name = "user_userId")
+	@RestResource(path = "movieUser", rel="user")
+	private @ManyToOne User user;
 	
 	private String genre = "";
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
+	@Column(name="movieId")
+	private Long movieId;
 	
 	@LastModifiedDate
 	private LocalDateTime modifiedTime;
 	
-	@Positive(message = "MovieId must be positive.")
-	private int movieId;
+	@Positive(message = "Id must be positive.")
+	private int tmdbId;
 	
 	@Min(value = 0, message = "Rating cannot be less than 0.")
 	@Max(value = 10, message = "Rating cannot be more than 10.")
@@ -41,10 +50,11 @@ public class Movie {
 
 	public Movie() {}
 	
-	public Movie(int movieId, String title, int year) {
-		this.movieId = movieId;
+	public Movie(int tmdbId, String title, int year, User user) {
+		this.tmdbId = tmdbId;
 		this.title = title;
 		this.year = year;
+		this.user = user;
 	}
 	
 	public String getGenre() {
@@ -55,16 +65,16 @@ public class Movie {
 		this.genre = genre;
 	}
 	
-	public Long getId() {
-		return id;
+	public Long getMovieId() {
+		return this.movieId;
 	}
 
-	public int getMovieId() {
-		return movieId;
+	public int getTmdbId() {
+		return this.tmdbId;
 	}
 
-	public void setMovieId(int movieId) {
-		this.movieId = movieId;
+	public void setTmdbId(int tmdbId) {
+		this.tmdbId = tmdbId;
 	}
 	
 	public LocalDateTime getModifiedTime() {
@@ -95,6 +105,14 @@ public class Movie {
 		this.review = review;
 	}
 	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public String getTitle() {
 		return title;
 	}

@@ -1,6 +1,7 @@
 package movies;
 
 import static movies.WebSocketConfiguration.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.rest.core.annotation.HandleAfterCreate;
@@ -10,6 +11,7 @@ import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,26 +21,25 @@ public class MovieEventHandler {
 	private final SimpMessagingTemplate websocket;
 	private final EntityLinks entityLinks;
 	
+	private final UserRepository userRepository;
+
 	@Autowired
 	public MovieEventHandler(MovieRepository repository, 
 			                 SimpMessagingTemplate websocket, 
-			                 EntityLinks entityLinks) {
+			                 EntityLinks entityLinks,
+			                 UserRepository userRepository) {
 		this.repository = repository;
 		this.websocket = websocket;
 		this.entityLinks = entityLinks;
+		this.userRepository = userRepository;
 	}
   
-    @HandleBeforeCreate
-    public void handleBeforeCreate(Movie movie) {
-	    if (this.repository.findByMovieId(movie.getMovieId()) != null) {
-		    throw new DuplicateKeyException("Duplicate key is found");
-	    }
-    }
-  
+
+
     @HandleAfterCreate
     public void handleAfterCreate(Movie movie) {
   	    if (!movie.getReview().isEmpty()) {
-  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "/10)";
+  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "//10)";
 		  this.websocket.convertAndSend(
 				MESSAGE_PREFIX + "/newReview", "{\"message\" : \"" + message + "\"}");
 	    }
@@ -47,19 +48,29 @@ public class MovieEventHandler {
     @HandleAfterSave
     public void handleAfterSave(Movie movie) {
   	    if (!movie.getReview().isEmpty()) {
-  	      String message = "User changed review for \'" + movie.getTitle() + "\' (" + movie.getRating() + "/10)";
+  	      String message = "User reviewed \'" + movie.getTitle() + "\' (" + movie.getRating() + "//10)";
 		  this.websocket.convertAndSend(
 				MESSAGE_PREFIX + "/changeReview", "{\"message\" : \"" + message + "\"}");
 	    }
     }
+    
+	@HandleBeforeCreate
+	@HandleBeforeSave
+	public void applyUserInformationUsingSecurityContext(Movie movie) {
 
-	/**
-	 * Take an {@link Employee} and get the URI using Spring Data REST's {@link EntityLinks}.
-	 *
-	 * @param employee
-	 */
-	private String getPath(Movie movie) {
-		return this.entityLinks.linkForSingleResource(movie.getClass(),
-				  movie.getId()).toUri().getPath();
+		String name = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = this.userRepository.findByName(name);
+		//System.out.println("Event usersssssssssssssss");
+		//System.out.println(name);
+		
+		if (user == null) {
+			System.out.println("New user");
+			User newUser = new User();
+			newUser.setName(name);
+			newUser.setRoles(new String[]{"ROLE_USER"});
+			user = this.userRepository.save(newUser);
+		}
+		movie.setUser(user);
 	}
+
 }

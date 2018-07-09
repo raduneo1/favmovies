@@ -16,13 +16,15 @@ import org.springframework.stereotype.Component;
 public class RequestFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse response = (HttpServletResponse) res;
-        response.setHeader("Access-Control-Allow-Origin", "https://fav-movie-1-react.herokuapp.com");
-        //response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    	///UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        //CorsConfiguration config = new CorsConfiguration();
+        
+    	HttpServletResponse response = (HttpServletResponse) res;
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Origin, X-Requested-With, Content-Type, Key, Accept");
         chain.doFilter(req, res);
     }
 
