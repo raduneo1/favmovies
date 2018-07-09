@@ -10,7 +10,7 @@ Main features:
 - TMDB: uses tMDB for movie API requests to acquire movie data and images
 - PRIME REACT: uses PrimeReact for uniform styling and dynamic React-ready Components, such as movie Autocomplete, and dynamic/sortable tables
 - OTHER: auditing is setup on server side in order to track when entities are created, event handler also used to prevent POST conflicts
-- TTESTING: 
+- TESTING: 
 - VALIDATION: Validation using JSR 380 (Bean Validation 2.0) on server side and PrimeReact on client side
 
 v1.0
@@ -27,16 +27,6 @@ v2.0
 - Movie Search is now more responsive (search results update as you type)
 - rating star component added to movie page
 - post requests now correctly setup to save only "rating" and "review" movie info, following a button 'click' event
-
-v3.0
-- rating/review info now obtained from server side upon loading of Movie page, using Spring Data query language (queryDSL)
-- Movie save button now only enabled if there are changes (to 'rating' or 'review') to save
-- Favorite Movies reimplemented as PrimeReact DataTable
-- Favorite Movies table now comes with filtering and sorting
-- Movie now correctly uses POST or PUT request depending on situation
-- Show dynamic movie rating description next to movie rating (i.e. 'Excellent', 'Poor', 'Average')
-- setup Stomp and WebSockets on client and server side to notify users when new reviews are published to the REST API:
-Home page on client side will update when this happens
 
 v3.0
 
@@ -75,6 +65,7 @@ to make Spring security functional on index.html
 - increased security on User repositories
 
 KNOWN BUG: WHen changing info of existing movie, will POST instead of PUT
+
 
 
 Challenges:
